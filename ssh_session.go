@@ -117,7 +117,8 @@ func (this *SSHSession) muxShell() error {
 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
-	if err := this.session.RequestPty("vt100", 80, 40, modes); err != nil {
+	// if err := this.session.RequestPty("vt100", 80, 40, modes); err != nil {
+	if err := this.session.RequestPty("XTerm", 80, 40, modes); err != nil {
 		LogError("RequestPty error:%s", err)
 		return err
 	}
