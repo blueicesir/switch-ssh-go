@@ -101,6 +101,7 @@ func filterResult(result, firstCmd string) string {
 		resultItem = strings.Replace(resultItem, " \b", "", -1)
 
 		// 过滤Terminal Color控制符,这个不是通用函数，仅仅用于华为USG6360设备的disp cur | include 指令。
+		// \0x1b[1D 控制表示一个Backspace正好是删除前面一个空格字符。后续可修改为检测是否存在0x1b[1D字符，如果存在，查找并删除前一个字符做到相对通用，抑或直接应用其它第三方Terminal CSI控制库进行过滤输出
 		if strings.Contains(resultItem," [1D"){
 			resultItem = strings.Replace(resultItem, " [1D", "", -1)
 		}
