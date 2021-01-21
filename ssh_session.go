@@ -117,8 +117,8 @@ func (this *SSHSession) muxShell() error {
 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
 		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
 	}
-	// if err := this.session.RequestPty("vt100", 80, 40, modes); err != nil {
-	if err := this.session.RequestPty("XTerm", 80, 40, modes); err != nil {
+	if err := this.session.RequestPty("vt100", 80, 40, modes); err != nil {
+	// if err := this.session.RequestPty("XTerm", 80, 40, modes); err != nil {
 		LogError("RequestPty error:%s", err)
 		return err
 	}
@@ -203,6 +203,8 @@ func (this *SSHSession) CheckSelf() bool {
 		}
 	}()
 
+	
+	// 相当于按回车键，等待新的提示符信息出现，如果有#或者> 以及]中的任何一个标识会话仍旧有效。
 	this.WriteChannel("\n")
 	result := this.ReadChannelExpect(2*time.Second, "#", ">", "]")
 	if strings.Contains(result, "#") ||
@@ -228,6 +230,7 @@ func (this *SSHSession) GetSSHBrand() string {
 		return this.brand
 	}
 	//显示版本后需要多一组空格，避免版本信息过多需要分页，导致分页指令第一个字符失效的问题
+	// 如果设置了分页为0的参数，理论上无需多个空格，
 	this.WriteChannel("dis version", "     ", "show version", "     ")
 	result := this.ReadChannelTiming(time.Second)
 	result = strings.ToLower(result)
@@ -283,7 +286,7 @@ func (this *SSHSession) ReadChannelExpect(timeout time.Duration, expects ...stri
 	LogDebug("ReadChannelExpect <wait timeout = %d>", timeout/time.Millisecond)
 	output := ""
 	isDelayed := false
-	for i := 0; i < 300; i++ { //最多从设备读取300次，避免方法无法返回
+	for i := 0; i < 300; i++ { //最多从设备读取300次，避免方法无法返回，这种通过特定次数的魔术数字的写法并不是一个好的编程范例。
 		time.Sleep(time.Millisecond * 100) //每次睡眠0.1秒，使out管道中的数据能积累一段时间，避免过早触发default等待退出
 		newData := this.readChannelData()
 		LogDebug("ReadChannelExpect: read chanel buffer: %s", newData)
@@ -292,6 +295,8 @@ func (this *SSHSession) ReadChannelExpect(timeout time.Duration, expects ...stri
 			isDelayed = false
 			continue
 		}
+		
+		// 判断读取到的内容中是否包含传入的表示输出结束的字符，如果包含，则返回执行结果
 		for _, expect := range expects {
 			if strings.Contains(output, expect) {
 				return output
