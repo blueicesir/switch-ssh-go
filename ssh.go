@@ -12,6 +12,7 @@ const (
 	CISCO  = "cisco"
 )
 
+// 如果需要禁止调试信息输出ssh.IsLogDebug=false
 var IsLogDebug = true
 
 /**
@@ -22,15 +23,20 @@ var IsLogDebug = true
  */
 func RunCommands(user, password, ipPort string, cmds ...string) (string, error) {
 	sessionKey := user + "_" + password + "_" + ipPort
+	// 设置会话参数，锁定会话
 	sessionManager.LockSession(sessionKey)
+	// 退出此函数时自动解锁会话
 	defer sessionManager.UnlockSession(sessionKey)
 
+	// 先检查是否存在会话信息
 	sshSession, err := sessionManager.GetSession(user, password, ipPort, "")
 	if err != nil {
 		LogError("GetSession error:%s", err)
 		return "", err
 	}
+	// 往会话中写入需要执行的命令
 	sshSession.WriteChannel(cmds...)
+	// 最多等待2秒获取返回结果
 	result := sshSession.ReadChannelTiming(2 * time.Second)
 	filteredResult := filterResult(result, cmds[0])
 	return filteredResult, nil
@@ -86,15 +92,25 @@ func GetSSHBrand(user, password, ipPort string) (string, error) {
 func filterResult(result, firstCmd string) string {
 	//对结果进行处理，截取出指令后的部分
 	filteredResult := ""
+	// 把捕获的返回内容根据\n分解成多个字符串
 	resultArray := strings.Split(result, "\n")
 	findCmd := false
 	promptStr := ""
 	for _, resultItem := range resultArray {
+		// 替换每行文本中的\b就是Basckspace退格为空，替换所有。
 		resultItem = strings.Replace(resultItem, " \b", "", -1)
+
+		// 过滤Terminal Color控制符,这个不是通用函数，仅仅用于华为USG6360设备的disp cur | include 指令。
+		if strings.Contains(resultItem,"[1D"){
+			resultItem = strings.Replace(resultItem, "[1D", "", -1)
+		}
+		
+		// 这里应该是替换提示符，但似乎原作者实现有些问题，实际上没有作用
 		if findCmd && (promptStr == "" || strings.Replace(resultItem, promptStr, "", -1) != "") {
 			filteredResult += resultItem + "\n"
 			continue
 		}
+		// 如果命令中包含传入指令的第一行数据，则替换
 		if strings.Contains(resultItem, firstCmd) {
 			findCmd = true
 			promptStr = resultItem[0:strings.Index(resultItem, firstCmd)]
@@ -104,6 +120,9 @@ func filterResult(result, firstCmd string) string {
 			//将命令添加到结果中
 			filteredResult += resultItem + "\n"
 		}
+		
+
+		
 	}
 	if !findCmd {
 		return result
