@@ -101,8 +101,8 @@ func filterResult(result, firstCmd string) string {
 		resultItem = strings.Replace(resultItem, " \b", "", -1)
 
 		// 过滤Terminal Color控制符,这个不是通用函数，仅仅用于华为USG6360设备的disp cur | include 指令。
-		if strings.Contains(resultItem,"[1D "){
-			resultItem = strings.Replace(resultItem, "[1D ", "", -1)
+		if strings.Contains(resultItem," [1D"){
+			resultItem = strings.Replace(resultItem, " [1D", "", -1)
 		}
 		
 		// 这里应该是替换提示符，但似乎原作者实现有些问题，实际上没有作用
