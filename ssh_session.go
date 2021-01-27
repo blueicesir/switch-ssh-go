@@ -286,7 +286,7 @@ func (this *SSHSession) ReadChannelExpect(timeout time.Duration, expects ...stri
 	LogDebug("ReadChannelExpect <wait timeout = %d>", timeout/time.Millisecond)
 	output := ""
 	isDelayed := false
-	for i := 0; i < 50; i++ { //最多从设备读取300次，避免方法无法返回，这种通过特定次数的魔术数字的写法并不是一个好的编程范例。
+	for i := 0; i < 10; i++ { //最多从设备读取300次，避免方法无法返回，这种通过特定次数的魔术数字的写法并不是一个好的编程范例。
 		time.Sleep(time.Millisecond * 100) //每次睡眠0.1秒，使out管道中的数据能积累一段时间，避免过早触发default等待退出
 		newData := this.readChannelData()
 		LogDebug("ReadChannelExpect: read chanel buffer: %s", newData)
@@ -325,7 +325,7 @@ func (this *SSHSession) ReadChannelTiming(timeout time.Duration) string {
 	output := ""
 	isDelayed := false
 
-	for i := 0; i < 50; i++ { //最多从设备读取300次，避免方法无法返回
+	for i := 0; i < 10; i++ { //最多从设备读取300次，避免方法无法返回
 		time.Sleep(time.Millisecond * 100) //每次睡眠0.1秒，使out管道中的数据能积累一段时间，避免过早触发default等待退出
 		newData := this.readChannelData()
 		LogDebug("ReadChannelTiming: read chanel buffer: %s", newData)
