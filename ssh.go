@@ -56,6 +56,7 @@ func RunCommandsWithBrand(user, password, ipPort, brand string, cmds ...string) 
 	sshSession, err := sessionManager.GetSession(user, password, ipPort, brand)
 	if err != nil {
 		LogError("GetSession error:%s", err)
+		fmt.Printf("GetSession error:%s\n",err)
 		return "", err
 	}
 	sshSession.WriteChannel(cmds...)
