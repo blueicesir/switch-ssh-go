@@ -55,10 +55,10 @@ func (this *SessionManager) GetSessionCache(sessionKey string) *SSHSession {
 	defer this.sessionCacheLocker.RUnlock()
 	cache, ok := this.sessionCache[sessionKey]
 	if ok {
-		fmt.Printf("GetSessionCache::会话存在%s\n",sessionKey)
+		// fmt.Printf("GetSessionCache::会话存在%s\n",sessionKey)
 		return cache
 	} else {
-		fmt.Printf("GetSessionCache::会话不存在%s\n",sessionKey)
+		// fmt.Printf("GetSessionCache::会话不存在%s\n",sessionKey)
 		return nil
 	}
 }
@@ -147,13 +147,13 @@ func (this *SessionManager) initSession(session *SSHSession, brand string) {
  */
 func (this *SessionManager) GetSession(user, password, ipPort, brand string) (*SSHSession, error) {
 	sessionKey := user + "_" + password + "_" + ipPort
-	fmt.Printf("SessionManager::GetSession sessionKey=%s\n",sessionKey)
+	// fmt.Printf("SessionManager::GetSession sessionKey=%s\n",sessionKey)
 	session := this.GetSessionCache(sessionKey)
 	if session != nil {
 		//返回前要验证是否可用，不可用要重新创建并更新缓存
 		if session.CheckSelf() {
 			LogDebug("-----GetSession from cache-----")
-			fmt.Printf("从缓存中获取会话成功,%s\n",sessionKey)
+			// fmt.Printf("从缓存中获取会话成功,%s\n",sessionKey)
 			session.UpdateLastUseTime()
 			return session, nil
 		}
