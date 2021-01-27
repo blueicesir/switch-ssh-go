@@ -159,7 +159,7 @@ func (this *SessionManager) GetSession(user, password, ipPort, brand string) (*S
 		LogDebug("Check session failed")
 	}
 	//如果不存在或者验证失败，需要重新连接，并更新缓存
-	fmt.Printf("缓存中存在会话%s\n",sessionKey)
+	// fmt.Printf("缓存中存在会话%s\n",sessionKey)
 	if err := this.updateSession(user, password, ipPort, brand); err != nil {
 		LogError("SSH session pool updateSession err:%s", err.Error())
 		return nil, err
