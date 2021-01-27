@@ -14,6 +14,8 @@ var (
 
 var sessionManager = NewSessionManager()
 
+
+
 /**
  * session（SSHSession）的管理类，会统一缓存打开的session，自动处理未使用超过10分钟的session
  * @attr sessionCache:缓存所有打开的map（10分钟内使用过的），sessionLocker设备锁，globalLocker全局锁
@@ -53,8 +55,10 @@ func (this *SessionManager) GetSessionCache(sessionKey string) *SSHSession {
 	defer this.sessionCacheLocker.RUnlock()
 	cache, ok := this.sessionCache[sessionKey]
 	if ok {
+		fmt.Printf("GetSessionCache::会话存在%s\n",sessionKey)
 		return cache
 	} else {
+		fmt.Printf("GetSessionCache::会话不存在%s\n",sessionKey)
 		return nil
 	}
 }
