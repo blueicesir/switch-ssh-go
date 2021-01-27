@@ -3,7 +3,6 @@ package ssh
 import (
 	"sync"
 	"time"
-	"fmt"
 )
 
 var (
