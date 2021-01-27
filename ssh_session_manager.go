@@ -142,17 +142,20 @@ func (this *SessionManager) initSession(session *SSHSession, brand string) {
  */
 func (this *SessionManager) GetSession(user, password, ipPort, brand string) (*SSHSession, error) {
 	sessionKey := user + "_" + password + "_" + ipPort
+	fmt.Printf("SessionManager::GetSession sessionKey=%s\n",sessionkey)
 	session := this.GetSessionCache(sessionKey)
 	if session != nil {
 		//返回前要验证是否可用，不可用要重新创建并更新缓存
 		if session.CheckSelf() {
 			LogDebug("-----GetSession from cache-----")
+			fmt.Printf("从缓存中获取会话成功,%s\n",sessionKey)
 			session.UpdateLastUseTime()
 			return session, nil
 		}
 		LogDebug("Check session failed")
 	}
 	//如果不存在或者验证失败，需要重新连接，并更新缓存
+	fmt.Printf("缓存中存在会话%s\n",sessionKey)
 	if err := this.updateSession(user, password, ipPort, brand); err != nil {
 		LogError("SSH session pool updateSession err:%s", err.Error())
 		return nil, err
