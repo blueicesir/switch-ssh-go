@@ -143,7 +143,7 @@ func (this *SessionManager) initSession(session *SSHSession, brand string) {
  */
 func (this *SessionManager) GetSession(user, password, ipPort, brand string) (*SSHSession, error) {
 	sessionKey := user + "_" + password + "_" + ipPort
-	fmt.Printf("SessionManager::GetSession sessionKey=%s\n",sessionkey)
+	fmt.Printf("SessionManager::GetSession sessionKey=%s\n",sessionKey)
 	session := this.GetSessionCache(sessionKey)
 	if session != nil {
 		//返回前要验证是否可用，不可用要重新创建并更新缓存
